@@ -1,33 +1,15 @@
 #ifndef MATRIX_MATRIX_OOP_
 #define MATRIX_MATRIX_OOP_
 
-#include <math.h>
-
+#include <cmath>
 #include <exception>
 #include <iostream>
 
 #define ACCURACY 1e-7
 
 class Matrix {
- private:
-  int rows_, cols_;
-  double** matrix_ = nullptr;
-
-  void MemoryAllocation();
-  void MemoryAllocation(const int rows, const int cols);
-  void MemoryAllocation(const Matrix& other);
-  void CopyElementMatrix(const Matrix& temp, const int rows, const int cols);
-  void FreeMemory();
-  void SizeError(const Matrix& other) const;
-  void EmptyMatrixError() const;
-  void EmptyMatrixError(const Matrix& other) const;
-  void ReducingMatrixTriangular(const Matrix& temp) const;
-  void MatrixReduction(const int r, const int c,
-                       Matrix& result_reduction) const;
-
  public:
   // Конструкторы и деструктор
-
   Matrix();
   Matrix(int rows, int cols);
   Matrix(int rows, int cols, const double data[]);
@@ -72,6 +54,23 @@ class Matrix {
   Matrix CalcComplements() const;
   double Determinant() const;
   Matrix InverseMtrix() const;
+
+ private:
+  void MemoryAllocation();
+  void MemoryAllocation(const int rows, const int cols);
+  void MemoryAllocation(const Matrix& other);
+  void CopyElementMatrix(const Matrix& temp, const int rows, const int cols);
+  void FreeMemory();
+  void SizeError(const Matrix& other) const;
+  void EmptyMatrixError() const;
+  void EmptyMatrixError(const Matrix& other) const;
+  void ReducingMatrixTriangular(const Matrix& temp) const;
+  void MatrixReduction(const int r, const int c,
+                       Matrix& result_reduction) const;
+
+ private:
+  int rows_, cols_;
+  double** matrix_ = nullptr;
 };
 
-#endif  // MATRIX__MATRIX_OOP_
+#endif  // MATRIX_MATRIX_OOP_

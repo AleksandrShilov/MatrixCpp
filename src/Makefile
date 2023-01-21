@@ -1,5 +1,5 @@
 TESTCOVERAGE = -fprofile-arcs -ftest-coverage
-STD = --std=c++17
+STD = -Wall -Werror -Wextra --std=c++17
 
 all: clean test matrix_oop.a gcov_report
 
@@ -26,7 +26,8 @@ matrix_oop.o: matrix_oop.cpp
 
 
 test.o: test.cpp
-	g++ $(STD) $(TESTCOVERAGE) -c $^ -o $@ 
+	g++ $(STD) $(TESTCOVERAGE) -c $^ -o $@
+
 
 check_leaks:
 	CK_FORK=no valgrind --leak-check=full --track-origins=yes -s ./test
