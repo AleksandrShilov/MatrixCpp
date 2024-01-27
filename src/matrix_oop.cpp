@@ -1,8 +1,11 @@
 #include "matrix_oop.h"
 
+namespace my {
+
 Matrix::Matrix() : rows_(0), cols_(0), matrix_(nullptr) {}
 
-Matrix::Matrix(int rows, int cols) : rows_(cols), cols_(rows) {
+Matrix::Matrix(int rows, int cols)
+    : rows_(cols), cols_(rows), matrix_(nullptr) {
   if (rows <= 0 || cols <= 0) {
     throw std::invalid_argument(
         "Error, rows and cols must be greater than zero");
@@ -10,11 +13,11 @@ Matrix::Matrix(int rows, int cols) : rows_(cols), cols_(rows) {
   MemoryAllocation(rows_, cols_);
 }
 
-Matrix::Matrix(const Matrix& other) : rows_(other.rows_), cols_(other.cols_) {
+Matrix::Matrix(const Matrix &other) : rows_(other.rows_), cols_(other.cols_) {
   MemoryAllocation(other);
 }
 
-Matrix::Matrix(Matrix&& other)
+Matrix::Matrix(Matrix &&other)
     : rows_(other.rows_), cols_(other.cols_), matrix_(other.matrix_) {
   other.rows_ = 0;
   other.cols_ = 0;
@@ -23,19 +26,19 @@ Matrix::Matrix(Matrix&& other)
 
 Matrix::~Matrix() { FreeMemory(); }
 
-Matrix Matrix::operator-(const Matrix& other) const {
+Matrix Matrix::operator-(const Matrix &other) const {
   Matrix result(*this);
   result.SubMatrix(other);
   return result;
 }
 
-Matrix Matrix::operator*(const Matrix& other) const {
+Matrix Matrix::operator*(const Matrix &other) const {
   Matrix result(*this);
   result.MulMatrix(other);
   return result;
 }
 
-Matrix operator*(const double num, const Matrix& other) {
+Matrix operator*(const double num, const Matrix &other) {
   Matrix result(other);
   result.MulNumber(num);
   return result;
@@ -47,12 +50,11 @@ Matrix Matrix::operator*(const double num) const {
   return result;
 }
 
-bool Matrix::operator==(const Matrix& other) const {
-  bool result = EqMatrix(other);
-  return result;
+bool Matrix::operator==(const Matrix &other) const {
+  return EqMatrix(other);
 }
 
-Matrix& Matrix::operator=(const Matrix& other) {
+Matrix &Matrix::operator=(const Matrix &other) {
   FreeMemory();
   rows_ = other.rows_;
   cols_ = other.cols_;
@@ -60,15 +62,15 @@ Matrix& Matrix::operator=(const Matrix& other) {
   return *this;
 }
 
-void Matrix::operator+=(const Matrix& other) { SumMatrix(other); }
+void Matrix::operator+=(const Matrix &other) { SumMatrix(other); }
 
-void Matrix::operator-=(const Matrix& other) { SubMatrix(other); }
+void Matrix::operator-=(const Matrix &other) { SubMatrix(other); }
 
-void Matrix::operator*=(const Matrix& other) { MulMatrix(other); }
+void Matrix::operator*=(const Matrix &other) { MulMatrix(other); }
 
 void Matrix::operator*=(const double num) { MulNumber(num); }
 
-double& Matrix::operator()(int i, int j) {
+double &Matrix::operator()(int i, int j) {
   EmptyMatrixError();
   if (i < 0 || i >= rows_ || j < 0 || j >= cols_) {
     throw std::out_of_range("Error, index incorrect");
@@ -91,9 +93,8 @@ void Matrix::SetRows(int rows) {
 
   if (rows != rows_) {
     Matrix temp(*this);
-    this->~Matrix();
+    FreeMemory();
 
-    // создание новой матрицы и заполнение нулями
     MemoryAllocation(rows, cols_);
 
     if (rows >= rows_) {
@@ -112,9 +113,8 @@ void Matrix::SetCols(int cols) {
 
   if (cols != cols_) {
     Matrix temp(*this);
-    this->~Matrix();
+    FreeMemory();
 
-    // создание новой матрицы и заполнение нулями
     MemoryAllocation(rows_, cols);
 
     if (cols >= cols_) {
@@ -130,39 +130,36 @@ int Matrix::GetRows() const { return rows_; }
 
 int Matrix::GetCols() const { return cols_; }
 
-bool Matrix::EqMatrix(const Matrix& other) const {
-  bool result = true;
+bool Matrix::EqMatrix(const Matrix &other) const {
   if (rows_ == other.rows_ && cols_ == other.cols_ && matrix_ &&
       other.matrix_) {
-    for (int i = 0; i < rows_; i++) {
-      for (int j = 0; j < cols_; j++) {
-        if (fabs(matrix_[i][j] - other.matrix_[i][j]) > ACCURACY) {
-          result = false;
-          break;
+    for (auto i = 0; i < rows_; ++i) {
+      for (auto j = 0; j < cols_; ++j) {
+        if (fabs(matrix_[i][j] - other.matrix_[i][j]) > KAccuracy) {
+          return false;
         }
       }
     }
-  } else {
-    result = false;
+    return true;
   }
-  return result;
+  return false;
 }
 
-void Matrix::SumMatrix(const Matrix& other) {
+void Matrix::SumMatrix(const Matrix &other) {
   EmptyMatrixError(other);
   SizeError(other);
-  for (int i = 0; i < rows_; i++) {
-    for (int j = 0; j < cols_; j++) {
+  for (auto i = 0; i < rows_; ++i) {
+    for (auto j = 0; j < cols_; ++j) {
       matrix_[i][j] += other.matrix_[i][j];
     }
   }
 }
 
-void Matrix::SubMatrix(const Matrix& other) {
+void Matrix::SubMatrix(const Matrix &other) {
   EmptyMatrixError(other);
   SizeError(other);
-  for (int i = 0; i < rows_; i++) {
-    for (int j = 0; j < cols_; j++) {
+  for (auto i = 0; i < rows_; ++i) {
+    for (auto j = 0; j < cols_; ++j) {
       matrix_[i][j] -= other.matrix_[i][j];
     }
   }
@@ -170,14 +167,14 @@ void Matrix::SubMatrix(const Matrix& other) {
 
 void Matrix::MulNumber(const double num) {
   EmptyMatrixError();
-  for (int i = 0; i < rows_; i++) {
-    for (int j = 0; j < cols_; j++) {
+  for (auto i = 0; i < rows_; ++i) {
+    for (auto j = 0; j < cols_; ++j) {
       matrix_[i][j] *= num;
     }
   }
 }
 
-void Matrix::MulMatrix(const Matrix& other) {
+void Matrix::MulMatrix(const Matrix &other) {
   if (cols_ != other.rows_) {
     throw std::invalid_argument(
         "Error, the number of columns of the first matrix is \
@@ -185,10 +182,9 @@ void Matrix::MulMatrix(const Matrix& other) {
   }
   EmptyMatrixError(other);
   Matrix res(rows_, other.cols_);
-  for (int i = 0; i < rows_; i++) {
-    for (int j = 0; j < other.cols_; j++) {
-      res.matrix_[i][j] = 0;
-      for (int k = 0; k < cols_; k++) {
+  for (auto i = 0; i < rows_; ++i) {
+    for (auto j = 0; j < other.cols_; ++j) {
+      for (auto k = 0; k < cols_; ++k) {
         res.matrix_[i][j] += matrix_[i][k] * other.matrix_[k][j];
       }
     }
@@ -201,8 +197,8 @@ Matrix Matrix::Transpose() const {
     throw std::invalid_argument("Error, incorect matrix");
   }
   Matrix result(rows_, cols_);
-  for (int i = 0; i < cols_; i++) {
-    for (int j = 0; j < rows_; j++) {
+  for (auto i = 0; i < cols_; ++i) {
+    for (auto j = 0; j < rows_; ++j) {
       result.matrix_[i][j] = matrix_[j][i];
     }
   }
@@ -219,11 +215,11 @@ Matrix Matrix::CalcComplements() const {
     result.matrix_[0][0] = 1;
   } else {
     Matrix reducation(rows_ - 1, cols_ - 1);
-    for (int i = 0; i < rows_; i++) {
-      for (int j = 0; j < cols_; j++) {
+    for (auto i = 0; i < rows_; ++i) {
+      for (auto j = 0; j < cols_; ++j) {
         MatrixReduction(i, j, reducation);
         double d = reducation.Determinant();
-        result.matrix_[i][j] = pow(-1., (double)(i + j)) * d;
+        result.matrix_[i][j] = pow(-1., (double) (i + j)) * d;
       }
     }
   }
@@ -236,19 +232,19 @@ double Matrix::Determinant() const {
     throw std::invalid_argument("Error, the matrix is not square");
   }
   Matrix temp(*this);
-  double det = 1;
+  double det = 1.;
   if (rows_ == 1) {
     det = temp.matrix_[0][0];
   } else {
     ReducingMatrixTriangular(temp);
-    for (int i = 0; i < rows_; i++) {
+    for (int i = 0; i < rows_; ++i) {
       det *= temp.matrix_[i][i];
     }
   }
   return det;
 }
 
-Matrix Matrix::InverseMtrix() const {
+Matrix Matrix::InverseMatrix() const {
   EmptyMatrixError();
   if (rows_ < 2) {
     throw std::invalid_argument("Erorr, incorrect matrix");
@@ -261,8 +257,8 @@ Matrix Matrix::InverseMtrix() const {
   }
 
   Matrix tempMatr = CalcComplements().Transpose();
-  for (int i = 0; i < rows_; i++) {
-    for (int j = 0; j < cols_; j++) {
+  for (auto i = 0; i < rows_; ++i) {
+    for (auto j = 0; j < cols_; ++j) {
       result.matrix_[i][j] = tempMatr.matrix_[i][j] / det;
     }
   }
@@ -272,14 +268,14 @@ Matrix Matrix::InverseMtrix() const {
 // Выделение памяти
 void Matrix::MemoryAllocation(const int rows, const int cols) {
   if (rows >= 0 && cols >= 0) {
-    matrix_ = new double*[rows];
-    for (int i = 0; i < rows; i++) {
+    matrix_ = new double *[rows];
+    for (auto i = 0; i < rows; ++i) {
       matrix_[i] = new double[cols]{};
     }
   }
 }
 
-Matrix Matrix::operator+(const Matrix& other) const {
+Matrix Matrix::operator+(const Matrix &other) const {
   Matrix result(*this);
   result.SumMatrix(other);
   return result;
@@ -289,11 +285,11 @@ Matrix::Matrix(int rows, int cols, const double data[]) {
   if (rows > 0 && cols > 0) {
     rows_ = rows;
     cols_ = cols;
-    matrix_ = new double*[rows_];
+    matrix_ = new double *[rows_];
     int k = 0;
-    for (int i = 0; i < rows_; i++) {
+    for (auto i = 0; i < rows_; ++i) {
       matrix_[i] = new double[cols_];
-      for (int j = 0; j < cols_; j++) {
+      for (auto j = 0; j < cols_; ++j) {
         matrix_[i][j] = data[k];
         k++;
       }
@@ -302,12 +298,12 @@ Matrix::Matrix(int rows, int cols, const double data[]) {
 }
 
 // Выделение памяти для копирования
-void Matrix::MemoryAllocation(const Matrix& other) {
+void Matrix::MemoryAllocation(const Matrix &other) {
   if (rows_ >= 0 && cols_ >= 0) {
-    matrix_ = new double*[rows_];
-    for (int i = 0; i < rows_; i++) {
+    matrix_ = new double *[rows_];
+    for (auto i = 0; i < rows_; ++i) {
       matrix_[i] = new double[cols_];
-      for (int j = 0; j < cols_; j++) {
+      for (auto j = 0; j < cols_; ++j) {
         matrix_[i][j] = other.matrix_[i][j];
       }
     }
@@ -315,10 +311,10 @@ void Matrix::MemoryAllocation(const Matrix& other) {
 }
 
 // Копирование элементов матрицы
-void Matrix::CopyElementMatrix(const Matrix& temp, const int rows,
+void Matrix::CopyElementMatrix(const Matrix &temp, const int rows,
                                const int cols) {
-  for (int i = 0; i < rows; i++) {
-    for (int j = 0; j < cols; j++) {
+  for (auto i = 0; i < rows; ++i) {
+    for (auto j = 0; j < cols; ++j) {
       matrix_[i][j] = temp.matrix_[i][j];
     }
   }
@@ -326,7 +322,7 @@ void Matrix::CopyElementMatrix(const Matrix& temp, const int rows,
 
 void Matrix::FreeMemory() {
   if (matrix_) {
-    for (int i = 0; i < rows_; i++) {
+    for (auto i = 0; i < rows_; ++i) {
       delete[] matrix_[i];
     }
     delete[] matrix_;
@@ -335,7 +331,7 @@ void Matrix::FreeMemory() {
 }
 
 // Ошибка размерности матриц
-void Matrix::SizeError(const Matrix& other) const {
+void Matrix::SizeError(const Matrix &other) const {
   if (rows_ != other.rows_ || cols_ != other.cols_) {
     throw std::invalid_argument("Error, different dimension of matrices");
   }
@@ -349,27 +345,27 @@ void Matrix::EmptyMatrixError() const {
 }
 
 // Ошибка пустых матриц
-void Matrix::EmptyMatrixError(const Matrix& other) const {
+void Matrix::EmptyMatrixError(const Matrix &other) const {
   if (matrix_ == nullptr || other.matrix_ == nullptr) {
     std::invalid_argument("Error, incorect matrix");
   }
 }
 
 // Приведение матрицы к треугольной
-void Matrix::ReducingMatrixTriangular(const Matrix& temp) const {
+void Matrix::ReducingMatrixTriangular(const Matrix &temp) const {
   double number_zero;
-  for (int i = 0; i < temp.rows_; i++) {
+  for (auto i = 0; i < temp.rows_; ++i) {
     if (!temp.matrix_[i][i]) {
-      for (int j = i + 1; j < rows_; j++) {
-        for (int k = 0; k < rows_; k++) {
+      for (auto j = i + 1; j < rows_; ++j) {
+        for (auto k = 0; k < rows_; ++k) {
           temp.matrix_[i][k] += temp.matrix_[j][k];
         }
       }
     }
     if (temp.matrix_[i][i]) {
-      for (int j = i + 1; j < temp.rows_; j++) {
+      for (auto j = i + 1; j < temp.rows_; ++j) {
         number_zero = temp.matrix_[j][i] / temp.matrix_[i][i];
-        for (int k = 0; k < temp.rows_; k++) {
+        for (auto k = 0; k < temp.rows_; ++k) {
           temp.matrix_[j][k] -= temp.matrix_[i][k] * number_zero;
         }
       }
@@ -378,18 +374,20 @@ void Matrix::ReducingMatrixTriangular(const Matrix& temp) const {
 }
 
 void Matrix::MatrixReduction(const int r, const int c,
-                             Matrix& matr_reduction) const {
-  int x = 0;
-  for (int i = 0; i < rows_; i++) {
+                             Matrix &matr_reduction) const {
+  auto x = 0;
+  for (auto i = 0; i < rows_; ++i) {
     if (r != i) {
-      int y = 0;
-      for (int j = 0; j < cols_; j++) {
+      auto y = 0;
+      for (auto j = 0; j < cols_; ++j) {
         if (c != j) {
           matr_reduction.matrix_[x][y] = matrix_[i][j];
-          y++;
+          ++y;
         }
       }
-      x++;
+      ++x;
     }
   }
 }
+
+}  // my

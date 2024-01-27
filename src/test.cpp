@@ -5,9 +5,14 @@
 #include "matrix_oop.h"
 
 using namespace std;
+using namespace my;
 
-// ************************ Базовый конеструктор ************************
-TEST(Create, test_1) { Matrix matr; }
+// ************************* Базовый конеструктор **************************
+TEST(Create, test_1) {
+  Matrix matr;
+  ASSERT_EQ(matr.GetRows(), 0);
+  ASSERT_EQ(matr.GetCols(), 0);
+}
 
 // ************************ Конструткор копирвоания ************************
 TEST(Copy, test_1) {
@@ -22,33 +27,33 @@ TEST(ConstructorParametr, test_1) {
   EXPECT_THROW(Matrix matr(-3, 3), invalid_argument);
 }
 
-// ************************ Конструткор переноса ************************
+// ************************ Конструткор перемещения ************************
 TEST(Transfer, test_1) {
   double data[] = {1, 2, 3, 4, 5, 6, 7, 8, 9};
   Matrix matr(3, 3, data);
   Matrix matr_result(3, 3, data);
   Matrix matr2 = move(matr);
-  bool result = matr2.EqMatrix(matr_result);
-  ASSERT_EQ(result, true);
+  bool equal = matr2.EqMatrix(matr_result);
+  ASSERT_EQ(equal, true);
 }
 
-// ************** Перегрузка оператора сложения **************
+// ************************** Оператор сложения ****************************
 TEST(OverloadPlus, test_1) {
   double data[] = {1.1, 2,  3.4, 8.1, 7.2, 6.3, 4, 5.2,
                    6,   12, 11,  21,  15,  7,   8, 2};
   double data_2[] = {1.1, 2,  3.4, 8.1, 7.2, 6.3, 4, 5.2,
-                     6,   12, 11,  21,  15,  7,   8, 3};
+                     6,   12, 11,  21,  15,  7,   8, 2};
   double result[] = {2.2, 4,  6.8, 16.2, 14.4, 12.6, 8,  10.4,
                      12,  24, 22,  42,   30,   14,   16, 4};
   Matrix matr_res(4, 4, result);
   Matrix matr(4, 4, data);
   Matrix matr2(4, 4, data_2);
   Matrix matr_plus = matr + matr2;
-  bool res = matr_res.EqMatrix(matr_plus);
-  ASSERT_EQ(res, false);
+  bool equal = matr_res.EqMatrix(matr_plus);
+  ASSERT_EQ(equal, true);
 }
 
-// ************** Перегрузка оператора вычитания **************
+// ************************** Оператор вычитания **************************
 TEST(OverloadSub, test_1) {
   double data[] = {1.1, 2,  3.4, 8.1, 7.2, 6.3, 4, 5.2,
                    6,   12, 11,  21,  15,  7,   8, 2};
@@ -64,7 +69,7 @@ TEST(OverloadSub, test_1) {
   ASSERT_EQ(res, false);
 }
 
-// ************** Перегрузка оператора умножения **************
+// ************************** Оператор умножения **************************
 TEST(OverloadMul, test_1) {
   double data[] = {1.1, 2,  3.4, 8.1, 7.2, 6.3, 4, 5.2,
                    6,   12, 11,  21,  15,  7,   8, 2};
@@ -81,7 +86,7 @@ TEST(OverloadMul, test_1) {
   ASSERT_EQ(res, true);
 }
 
-// ************** Перегрузка оператора умножения для числа **************
+// ********************* Оператор умножения на число *********************
 TEST(OverloadMulNum, test_1) {
   double data[] = {1.1, 2,  3.4, 8.1, 7.2, 6.3, 4, 5.2,
                    6,   12, 11,  21,  15,  7,   8, 2};
@@ -106,7 +111,7 @@ TEST(OverloadMulNum, test_2) {
   ASSERT_EQ(res, true);
 }
 
-// ************************ Перегрузка оператора == ************************
+// **************************** Оператор == *****************************
 TEST(OverloadEqMatr, test_1) {
   double data[] = {1.1, 2,  3.4, 8.1, 7.2, 6.3, 4, 5.2,
                    6,   12, 11,  21,  15,  7,   8, 2};
@@ -118,7 +123,7 @@ TEST(OverloadEqMatr, test_1) {
   ASSERT_EQ(res, false);
 }
 
-// ************************ Перегрузка оператора = ************************
+// ***************************** Оператор = *****************************
 TEST(OverloadEqual, test_1) {
   double data[] = {1.1, 2,  3.4, 8.1, 7.2, 6.3, 4, 5.2,
                    6,   12, 11,  21,  15,  7,   8, 2};
@@ -129,12 +134,12 @@ TEST(OverloadEqual, test_1) {
   ASSERT_EQ(res, true);
 }
 
-// ************************ Перегрузка оператора += ************************
+// **************************** Оператор += ****************************
 TEST(OverloadSumEq, test_1) {
   double data[] = {1.1, 2,  3.4, 8.1, 7.2, 6.3, 4, 5.2,
                    6,   12, 11,  21,  15,  7,   8, 2};
   double data_2[] = {1.1, 2,  3.4, 8.1, 7.2, 6.3, 4, 5.2,
-                     6,   12, 11,  21,  15,  7,   8, 3};
+                     6,   12, 11,  21,  15,  7,   8, 2};
   double result[] = {2.2, 4,  6.8, 16.2, 14.4, 12.6, 8,  10.4,
                      12,  24, 22,  42,   30,   14,   16, 4};
   Matrix matr_res(4, 4, result);
@@ -142,26 +147,26 @@ TEST(OverloadSumEq, test_1) {
   Matrix matr2(4, 4, data_2);
   matr += matr2;
   bool res = matr_res.EqMatrix(matr);
-  ASSERT_EQ(res, false);
+  ASSERT_EQ(res, true);
 }
 
-// ************************ Перегрузка оператора -= ************************
+// **************************** Оператор  -= ****************************
 TEST(OverloadSubEq, test_1) {
   double data[] = {1.1, 2,  3.4, 8.1, 7.2, 6.3, 4, 5.2,
                    6,   12, 11,  21,  15,  7,   8, 2};
   double data_2[] = {2.2, 4,  6.8, 16.2, 14.4, 12.6, 8,  10.4,
                      12,  24, 22,  42,   30,   14,   16, 4};
   double result[] = {1.1, 2,  3.4, 8.1, 7.2, 6.3, 4, 5.2,
-                     6,   12, 11,  21,  15,  7,   8, 3};
+                     6,   12, 11,  21,  15,  7,   8, 2};
   Matrix matr_res(4, 4, result);
   Matrix matr(4, 4, data);
   Matrix matr2(4, 4, data_2);
   matr2 -= matr;
   bool res = matr_res.EqMatrix(matr2);
-  ASSERT_EQ(res, false);
+  ASSERT_EQ(res, true);
 }
 
-// ************************ Перегрузка оператора *= ************************
+// **************************** Оператор *= ****************************
 TEST(OverloadMulEq, test_1) {
   double data[] = {1.1, 2,  3.4, 8.1, 7.2, 6.3, 4, 5.2,
                    6,   12, 11,  21,  15,  7,   8, 2};
@@ -178,7 +183,7 @@ TEST(OverloadMulEq, test_1) {
   ASSERT_EQ(res, true);
 }
 
-// ************** Перегрузка оператора *= для числа **************
+// ********************** Оператор  *= для числа **********************
 TEST(OverloadMulEqNum, test_1) {
   double data[] = {1.1, 2,  3.4, 8.1, 7.2, 6.3, 4, 5.2,
                    6,   12, 11,  21,  15,  7,   8, 2};
@@ -191,7 +196,7 @@ TEST(OverloadMulEqNum, test_1) {
   ASSERT_EQ(res, true);
 }
 
-// ************** Перегрузка оператора индексации **************
+// ************************ Оператор индексации ***********************
 TEST(OverloadIndex, test_1) {
   double data[] = {1.1, 2,  3.4, 8.1, 7.2, 6.3, 4, 5.2,
                    6,   12, 11,  21,  15,  7,   8, 2};
@@ -396,7 +401,7 @@ TEST(SubMatrix, test_3) {
   ASSERT_EQ(matr_2.EqMatrix(matr), false);
 }
 
-// ************************ Умножение матрицы на число ************************
+// ******************** Умножение матрицы на число *******************
 TEST(MulNumber, test_1) {
   double data[] = {1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16};
   double result[] = {2,  4,  6,  8,  10, 12, 14, 16,
@@ -412,7 +417,7 @@ TEST(MulNumber, test_2) {
   EXPECT_THROW(matr.MulNumber(2), invalid_argument);
 }
 
-// ************************ Перемножение матриц ************************
+// *********************** Перемножение матриц ***********************
 TEST(MulMatrix, test_1) {
   double data[] = {1.1, 2, 3.4, 8.1, 7.2, 6.3, 4, 5.2, 6};
   double data_2[] = {2.2, 4,  6.8, 16.2, 14.4, 12.6, 8,  10.4,
@@ -422,7 +427,7 @@ TEST(MulMatrix, test_1) {
   EXPECT_THROW(matr2.MulMatrix(matr), invalid_argument);
 }
 
-// ************************ Транспортирование матрицы ************************
+// ******************* Транспортирование матрицы *********************
 TEST(Transpose, test_1) {
   double data[] = {1, 2, 3, 4, 5, 6, 7, 8, 9};
   double result[] = {1, 4, 7, 2, 5, 8, 3, 6, 9};
@@ -438,7 +443,7 @@ TEST(Transpose, test_2) {
   EXPECT_THROW(matr.Transpose(), invalid_argument);
 }
 
-// ************************ Определитель матрицы ************************
+// *********************** Определитель матрицы ***********************
 TEST(Determinant, test_1) {
   double data[] = {1, 2, 3, 4, 5, 6, 7, 8, 9};
   Matrix matr(3, 3, data);
@@ -480,7 +485,7 @@ TEST(Determinant, test_6) {
   EXPECT_THROW(matr.Determinant(), invalid_argument);
 }
 
-// ************************ CalcComplements матрицы ************************
+// ********************* CalcComplements матрицы **********************
 TEST(CalcComplements, test_1) {
   double data[] = {6.7, 5, -4, 99};
   double result[] = {99, 4, -5, 6.7};
@@ -531,14 +536,14 @@ TEST(CalcComplements, test_5) {
   ASSERT_EQ(res, true);
 }
 
-// ************************ InverseMtrix ************************
-TEST(InverseMtrix, test_1) {
+// ************************ InverseMatrix ************************
+TEST(InverseMatrix, test_1) {
   double data[] = {2, 5, 7, 6, 3, 4, 5, -2, -3};
   double result[] = {1, -1, 1, -38, 41, -34, 27, -29, 24};
   Matrix matr(3, 3, data);
   Matrix matr2;
   Matrix matr_res(3, 3, result);
-  matr2 = matr.InverseMtrix();
+  matr2 = matr.InverseMatrix();
   ASSERT_EQ(matr2.EqMatrix(matr_res), true);
 }
 
@@ -548,7 +553,7 @@ TEST(InverseMtrix, test_2) {
   Matrix matr(2, 3, data);
   Matrix matr2;
   Matrix matr_res(3, 3, result);
-  EXPECT_THROW(matr2 = matr.InverseMtrix(), invalid_argument);
+  EXPECT_THROW(matr2 = matr.InverseMatrix(), invalid_argument);
 }
 
 TEST(InverseMtrix, test_3) {
@@ -557,18 +562,17 @@ TEST(InverseMtrix, test_3) {
   Matrix matr(3, 3, data);
   Matrix matr2;
   Matrix matr_res(3, 3, result);
-  EXPECT_THROW(matr2 = matr.InverseMtrix(), invalid_argument);
+  EXPECT_THROW(matr2 = matr.InverseMatrix(), invalid_argument);
 }
 
 TEST(InverseMtrix, test_4) {
   double data[] = {1};
   Matrix matr(1, 1, data);
   Matrix matr2;
-  EXPECT_THROW(matr2 = matr.InverseMtrix(), invalid_argument);
+  EXPECT_THROW(matr2 = matr.InverseMatrix(), invalid_argument);
 }
 
 int main(int argc, char **argv) {
   ::testing::InitGoogleTest(&argc, argv);
-
   return RUN_ALL_TESTS();
 }
